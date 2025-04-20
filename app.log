@@ -1,0 +1,36 @@
+2025-04-19 15:12:53,822 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:12:53,822 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:13:27,291 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:13:27,292 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:13:27,292 - INFO -  * Restarting with watchdog (fsevents)
+2025-04-19 15:13:27,661 - WARNING -  * Debugger is active!
+2025-04-19 15:13:27,668 - INFO -  * Debugger PIN: 150-198-958
+2025-04-19 15:14:14,250 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:14:14,250 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:16:04,134 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:16:04,134 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:16:22,075 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:16:22,075 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:18:16,839 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:18:16,839 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:18:39,763 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:18:39,763 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:18:47,507 - DEBUG - Starting Flask server
+2025-04-19 15:18:47,514 - DEBUG - Database tables created
+2025-04-19 15:19:02,608 - DEBUG - Starting Flask server
+2025-04-19 15:19:02,612 - DEBUG - Database tables created
+2025-04-19 15:20:09,174 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:20:09,174 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-19 15:20:16,328 - DEBUG - Starting Flask server
+2025-04-19 15:20:16,332 - DEBUG - Database tables created
+2025-04-19 15:32:05,717 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-19 15:32:05,718 - INFO - [33mPress CTRL+C to quit[0m

@@ -1,0 +1,229 @@
+{% extends "layout.html" %}
+{% block title %}Rides | ShareWay{% endblock %}
+{% block main %}
+<section class="container py-5">
+    <h2 class="text-center mb-5" data-aos="fade-up">Available Rides</h2>
+
+    {% if rides or bookings %}
+        <!-- Search and Sort Controls -->
+        <div class="mb-4" data-aos="fade-up">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="ride-search" placeholder="Search by name, destination, or vehicle model...">
+                        <button class="btn btn-primary" type="button" id="ride-search-btn"><i class="bi bi-search"></i> Search</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <select class="form-select" id="ride-sort">
+                        <option value="time-asc">Sort by Time (Earliest First)</option>
+                        <option value="time-desc">Sort by Time (Latest First)</option>
+                        <option value="people-asc">Sort by People/Seats (Low to High)</option>
+                        <option value="people-desc">Sort by People/Seats (High to Low)</option>
+                        <option value="destination-asc">Sort by Destination (A-Z)</option>
+                        <option value="destination-desc">Sort by Destination (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared Rides -->
+        {% if rides %}
+            <h3 class="mb-4" data-aos="fade-up">Shared Rides</h3>
+            <div class="row" id="shared-rides">
+                {% for ride in rides %}
+                    <div class="col-md-6 col-lg-4 mb-4 ride-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}"
+                         data-time="{{ ride.time | todatetime | strftime('%Y-%m-%dT%H:%M:%S') }}"
+                         data-people="{{ ride.people }}"
+                         data-destination="{{ ride.destination | lower }}"
+                         data-name="{{ ride.name | lower }}">
+                        <div class="card h-100 shadow-sm">
+                            <img src="{{ url_for('static', filename='images/share-card2.png') }}" class="card-img-top" alt="Shared Ride">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ ride.name }} to {{ ride.destination }}</h5>
+                                <p class="card-text">
+                                    <strong>Time:</strong> {{ ride.time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                    <strong>People:</strong> {{ ride.people }}<br>
+                                    <strong>Stops:</strong> {{ ride_stops[ride.id] | join(', ') or 'None' }}
+                                </p>
+                                <div class="d-flex gap-2">
+                                    {% if participants.get((session.user, 'ride', ride.id)) %}
+                                        <form action="{{ url_for('leave_ride', ride_id=ride.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" {% if ride_leave_disabled[ride.id] %}disabled title="Cannot leave within 1 hour of departure"{% endif %}>Leave Ride</button>
+                                        </form>
+                                        <button type="button" class="btn btn-info btn-sm chat-btn" data-bs-toggle="modal" data-bs-target="#chatRideModal{{ ride.id }}" data-room="ride-{{ ride.id }}" data-ride-id="{{ ride.id }}">Chat</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#joinRideModal{{ ride.id }}" {% if ride_join_disabled[ride.id] %}disabled{% endif %}>
+                                            Join Ride
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Join Ride Modal -->
+                    <div class="modal fade" id="joinRideModal{{ ride.id }}" tabindex="-1" aria-labelledby="joinRideModalLabel{{ ride.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{ url_for('static', filename='images/modal-bg.jpg') }}') no-repeat center/cover;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-light" id="joinRideModalLabel{{ ride.id }}">Join {{ ride.name }}'s Ride</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ url_for('join_ride', ride_id=ride.id) }}" method="POST">
+                                        <div class="mb-3">
+                                            <label for="additional_people_{{ ride.id }}" class="form-label text-light">Number of People</label>
+                                            <input type="number" class="form-control" id="additional_people_{{ ride.id }}" name="additional_people" min="1" max="{{ 7 - ride.people }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="stop-input-ride-{{ ride.id }}" class="form-label text-light">Your Stop</label>
+                                            <input type="text" class="form-control" id="stop-input-ride-{{ ride.id }}" name="stop" placeholder="Enter your stop" required>
+                                            <input type="hidden" id="stop-place-id-ride-{{ ride.id }}" name="stop_place_id">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Join Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chat Ride Modal -->
+                    {% if participants.get((session.user, 'ride', ride.id)) %}
+                        <div class="modal fade" id="chatRideModal{{ ride.id }}" tabindex="-1" aria-labelledby="chatRideModalLabel{{ ride.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="chatRideModalLabel{{ ride.id }}">Chat for {{ ride.name }}'s Ride</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="chat-messages-ride-{{ ride.id }}" style="height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background-color: #f8f9fa;">
+                                            {% for message in ride_messages[ride.id] %}
+                                                <div class="mb-2 {% if message.user == session.user %}text-end{% endif %}">
+                                                    <div class="d-inline-block p-2 rounded {% if message.user == session.user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                                        <strong>{{ message.user }}</strong> <small class="text-muted">({{ message.timestamp }})</small><br>
+                                                        {{ message.content }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <form id="chat-form-ride-{{ ride.id }}" action="" method="" class="mt-3" novalidate data-modal-persist="true">
+                                            <input type="hidden" id="current-user-ride-{{ ride.id }}" value="{{ session.user }}">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="chat-input-ride-{{ ride.id }}" placeholder="Type your message...">
+                                                <button type="submit" class="btn btn-primary" id="send-btn-ride-{{ ride.id }}">Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Booked Rides -->
+        {% if bookings %}
+            <h3 class="mb-4" data-aos="fade-up">Booked Rides</h3>
+            <div class="row" id="booked-rides">
+                {% for booking in bookings %}
+                    <div class="col-md-6 col-lg-4 mb-4 ride-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}"
+                         data-time="{{ booking.departure_time | todatetime | strftime('%Y-%m-%dT%H:%M:%S') }}"
+                         data-people="{{ booking.people }}"
+                         data-destination="{{ booking.destination | lower }}"
+                         data-vehicle-model="{{ booking.vehicle_model | lower }}">
+                        <div class="card h-100 shadow-sm">
+                            <img src="{{ url_for('static', filename='images/book-card4.png') }}" class="card-img-top" alt="Booked Ride">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ booking.vehicle_model }}</h5>
+                                <p class="card-text">
+                                    <strong>Time:</strong> {{ booking.departure_time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                    <strong>Seats:</strong> {{ booking.people }} / {{ booking.seat_capacity }}<br>
+                                    <strong>License:</strong> {{ booking.license_number }}<br>
+                                    <strong>Stops:</strong> {{ booking_stops[booking.id] | join(', ') or 'None' }}
+                                </p>
+                                <div class="d-flex gap-2">
+                                    {% if participants.get((session.user, 'booking', booking.id)) %}
+                                        <form action="{{ url_for('leave_booking', booking_id=booking.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" {% if booking_leave_disabled[booking.id] %}disabled title="Cannot leave within 1 hour of departure"{% endif %}>Leave Booking</button>
+                                        </form>
+                                        <button type="button" class="btn btn-info btn-sm chat-btn" data-bs-toggle="modal" data-bs-target="#chatBookingModal{{ booking.id }}" data-room="booking-{{ booking.id }}" data-booking-id="{{ booking.id }}">Chat</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#joinBookingModal{{ booking.id }}" {% if booking_join_disabled[booking.id] %}disabled{% endif %}>
+                                            Join Booking
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Join Booking Modal -->
+                    <div class="modal fade" id="joinBookingModal{{ booking.id }}" tabindex="-1" aria-labelledby="joinBookingModalLabel{{ booking.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{ url_for('static', filename='images/modal-bg.jpg') }}') no-repeat center/cover;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-light" id="joinBookingModalLabel{{ booking.id }}">Join {{ booking.vehicle_model }} Booking</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ url_for('join_booking', booking_id=booking.id) }}" method="POST">
+                                        <div class="mb-3">
+                                            <label for="additional_people_booking_{{ booking.id }}" class="form-label text-light">Number of People</label>
+                                            <input type="number" class="form-control" id="additional_people_booking_{{ booking.id }}" name="additional_people" min="1" max="{{ booking.seat_capacity - booking.people }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="stop-input-booking-{{ booking.id }}" class="form-label text-light">Your Stop</label>
+                                            <input type="text" class="form-control" id="stop-input-booking-{{ booking.id }}" name="stop" placeholder="Enter your stop" required>
+                                            <input type="hidden" id="stop-place-id-booking-{{ booking.id }}" name="stop_place_id">
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Join Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chat Booking Modal -->
+                    {% if participants.get((session.user, 'booking', booking.id)) %}
+                        <div class="modal fade" id="chatBookingModal{{ booking.id }}" tabindex="-1" aria-labelledby="chatBookingModalLabel{{ booking.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="chatBookingModalLabel{{ booking.id }}">Chat for {{ booking.vehicle_model }} Booking</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="chat-messages-booking-{{ booking.id }}" style="height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background-color: #f8f9fa;">
+                                            {% for message in booking_messages[booking.id] %}
+                                                <div class="mb-2 {% if message.user == session.user %}text-end{% endif %}">
+                                                    <div class="d-inline-block p-2 rounded {% if message.user == session.user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                                        <strong>{{ message.user }}</strong> <small class="text-muted">({{ message.timestamp }})</small><br>
+                                                        {{ message.content }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <form id="chat-form-booking-{{ booking.id }}" action="" method="" class="mt-3" novalidate data-modal-persist="true">
+                                            <input type="hidden" id="current-user-booking-{{ booking.id }}" value="{{ session.user }}">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="chat-input-booking-{{ booking.id }}" placeholder="Type your message...">
+                                                <button type="submit" class="btn btn-primary" id="send-btn-booking-{{ booking.id }}">Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- No Results Message -->
+        <div id="no-results" class="text-center d-none" data-aos="fade-up">
+            <p>No rides match your search criteria.</p>
+        </div>
+    {% else %}
+        <p class="text-center" data-aos="fade-up">No rides or bookings available at the moment.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block title %}My Bookings | ShareWay{% endblock %}
+{% block main %}
+<section class="container py-5">
+    <h2 class="text-center mb-5" data-aos="fade-up">My Bookings</h2>
+
+    <!-- Current Shared Rides -->
+    {% if current_shared %}
+        <h3 class="mb-4" data-aos="fade-up">Current Shared Rides</h3>
+        <div class="row">
+            {% for ride in current_shared %}
+                <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ url_for('static', filename='images/share-card2.png') }}" class="card-img-top" alt="Shared Ride">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ ride.name }} to {{ ride.destination }}</h5>
+                            <p class="card-text">
+                                <strong>Time:</strong> {{ ride.time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                <strong>People:</strong> {{ ride.people }}<br>
+                                <strong>Stops:</strong> {{ ride_stops[ride.id] | join(', ') or 'None' }}
+                            </p>
+                            <form action="{{ url_for('leave_ride', ride_id=ride.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" {% if ride_leave_disabled[ride.id] %}disabled title="Cannot leave within 1 hour of departure"{% endif %}>Leave Ride</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Current Booked Rides -->
+    {% if current_booked %}
+        <h3 class="mb-4" data-aos="fade-up">Current Booked Rides</h3>
+        <div class="row">
+            {% for booking in current_booked %}
+                <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ url_for('static', filename='images/book-card5.png') }}" class="card-img-top" alt="Booked Ride">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ booking.vehicle_model }}</h5>
+                            <p class="card-text">
+                                <strong>Time:</strong> {{ booking.departure_time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                <strong>Seats:</strong> {{ booking.people }} / {{ booking.seat_capacity }}<br>
+                                <strong>License:</strong> {{ booking.license_number }}<br>
+                                <strong>Stops:</strong> {{ booking_stops[booking.id] | join(', ') or 'None' }}
+                            </p>
+                            <form action="{{ url_for('leave_booking', booking_id=booking.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" {% if booking_leave_disabled[booking.id] %}disabled title="Cannot leave within 1 hour of departure"{% endif %}>Leave Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Previous Shared Rides -->
+    {% if previous_shared %}
+        <h3 class="mb-4" data-aos="fade-up">Previous Shared Rides</h3>
+        <div class="row">
+            {% for ride in previous_shared %}
+                <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ url_for('static', filename='images/share-card.jpg') }}" class="card-img-top" alt="Shared Ride">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ ride.name }} to {{ ride.destination }}</h5>
+                            <p class="card-text">
+                                <strong>Time:</strong> {{ ride.time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                <strong>People:</strong> {{ ride.people }}<br>
+                                <strong>Stops:</strong> {{ ride_stops[ride.id] | join(', ') or 'None' }}
+                            </p>
+                            <p class="text-muted">Ride has ended.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Previous Booked Rides -->
+    {% if previous_booked %}
+        <h3 class="mb-4" data-aos="fade-up">Previous Booked Rides</h3>
+        <div class="row">
+            {% for booking in previous_booked %}
+                <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ url_for('static', filename='images/book-card.jpg') }}" class="card-img-top" alt="Booked Ride">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ booking.vehicle_model }}</h5>
+                            <p class="card-text">
+                                <strong>Time:</strong> {{ booking.departure_time | todatetime | strftime('%b %d, %Y %I:%M %p') }}<br>
+                                <strong>Seats:</strong> {{ booking.people }} / {{ booking.seat_capacity }}<br>
+                                <strong>License:</strong> {{ booking.license_number }}<br>
+                                <strong>Stops:</strong> {{ booking_stops[booking.id] | join(', ') or 'None' }}
+                            </p>
+                            <p class="text-muted">Booking has ended.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if not (current_shared or current_booked or previous_shared or previous_booked) %}
+        <p class="text-center" data-aos="fade-up">You haven't joined any rides yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

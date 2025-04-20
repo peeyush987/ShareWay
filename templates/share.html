@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block title %}Share a Ride | ShareWay{% endblock %}
+{% block main %}
+<section class="container py-5 text-center">
+    <h2 class="mb-4" data-aos="fade-up">Share a Ride</h2>
+    <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Offer a ride to others and make new connections!</p>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareRideModal" data-aos="fade-up" data-aos-delay="200">
+        Share Now
+    </button>
+</section>
+<!-- Share Ride Modal -->
+<div class="modal fade" id="shareRideModal" tabindex="-1" aria-labelledby="shareRideModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ url_for('static', filename='images/modal-bg.jpg') }}') no-repeat center/cover;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareRideModalLabel">Share a Ride</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('share_ride') }}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Destination</label>
+                        <input type="text" name="destination" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Departure Time</label>
+                        <input type="datetime-local" name="time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Number of People</label>
+                        <input type="number" name="people" class="form-control" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Your Stop</label>
+                        <input type="text" id="stop-input" name="stop" class="form-control" placeholder="e.g., Downtown Station" required>
+                        <input type="hidden" id="stop-place-id" name="stop_place_id">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Share Ride</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ride Listings -->
+<div class="mt-5">
+    <h3 class="mb-3">Available Rides</h3>
+    {% if rides %}
+        <div class="row g-3">
+            {% for ride in rides %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ ride.destination }}</h5>
+                            <p class="card-text">
+                                <strong>Name:</strong> {{ ride.name }}<br>
+                                <strong>Time:</strong> {{ ride.time }}<br>
+                                <strong>Seats:</strong> {{ ride.people }}<br>
+                                <strong>Stop:</strong> {{ ride.stop or 'None' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No rides shared yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

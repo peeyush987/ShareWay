@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block title %}Welcome | ShareWay{% endblock %}
+{% block main %}
+<!-- Hero Section -->
+<section class="hero-section text-center text-light" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{ url_for('static', filename='images/hero-bg.jpg') }}') no-repeat center/cover; min-height: 400px;">
+    <div class="container py-5">
+        <h1 class="fw-bold mb-3" data-aos="fade-up">Welcome to ShareWay</h1>
+        <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Ride smart, ride together. Share or book your journey today!</p>
+        {% if session.user %}
+            <a href="#ride-tabs" class="btn btn-primary btn-lg" data-aos="fade-up" data-aos-delay="200">Get Started</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg" data-aos="fade-up" data-aos-delay="200">Login to Start</a>
+        {% endif %}
+    </div>
+</section>
+{% if session.user %}
+    <!-- Ride Tabs -->
+    <section class="container py-5" id="ride-tabs">
+        <ul class="nav nav-pills justify-content-center mb-4" id="rideTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if request.args.get('tab') != 'book' %}active{% endif %}" id="share-tab" data-bs-toggle="pill" data-bs-target="#share" type="button" role="tab">Share Ride</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if request.args.get('tab') == 'book' %}active{% endif %}" id="book-tab" data-bs-toggle="pill" data-bs-target="#book" type="button" role="tab">Book Ride</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="rideTabsContent">
+            <!-- Share Ride Form -->
+            <div class="tab-pane fade {% if request.args.get('tab') != 'book' %}show active{% endif %}" id="share" role="tabpanel">
+                <div class="card shadow-sm mx-auto" style="max-width: 500px;" data-aos="fade-up">
+                    <img src="{{ url_for('static', filename='images/share-card.jpg') }}" class="card-img-top" alt="Share a Ride">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-3">Share a Ride</h4>
+                        <form action="{{ url_for('share_ride') }}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Destination</label>
+                                <input type="text" name="destination" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Departure Time</label>
+                                <input type="datetime-local" name="time" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Number of People</label>
+                                <input type="number" name="people" class="form-control" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Your Stop</label>
+                                <input type="text" id="stop-input" name="stop" class="form-control" placeholder="e.g., Library" required>
+                                <input type="hidden" id="stop-place-id" name="stop_place_id">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Share Ride</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Book Ride Form -->
+            <div class="tab-pane fade {% if request.args.get('tab') == 'book' %}show active{% endif %}" id="book" role="tabpanel">
+                <div class="card shadow-sm mx-auto" style="max-width: 500px;" data-aos="fade-up">
+                    <img src="{{ url_for('static', filename='images/book-card.jpg') }}" class="card-img-top" alt="Book a Ride">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-3">Book a Ride</h4>
+                        <form action="{{ url_for('book_ride') }}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Vehicle Model</label>
+                                <input type="text" name="vehicle_model" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Seat Capacity</label>
+                                <input type="number" name="seat_capacity" class="form-control" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">License Number</label>
+                                <input type="text" name="license_number" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Departure Time</label>
+                                <input type="datetime-local" name="departure_time" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Number of People in Vehicle</label>
+                                <input type="number" name="people" class="form-control" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Your Stop</label>
+                                <input type="text" id="stop-input" name="stop" class="form-control" placeholder="e.g., Central Park" required>
+                                <input type="hidden" id="stop-place-id" name="stop_place_id">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Book Ride</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% else %}
+    <section class="container py-5 text-center">
+        <h3 class="mb-4" data-aos="fade-up">Join ShareWay Today</h3>
+        <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Please <a href="{{ url_for('login') }}">login</a> or <a href="{{ url_for('register') }}">register</a> to access ride options.</p>
+    </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block title %}Book a Ride | ShareWay{% endblock %}
+{% block main %}
+<section class="container py-5 text-center">
+    <h2 class="mb-4" data-aos="fade-up">Book a Ride</h2>
+    <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">Plan your journey with ease and comfort!</p>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookRideModal" data-aos="fade-up" data-aos-delay="200">
+        Book Now
+    </button>
+</section>
+<!-- Book Ride Modal -->
+<div class="modal fade" id="bookRideModal" tabindex="-1" aria-labelledby="bookRideModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ url_for('static', filename='images/modal-bg.jpg') }}') no-repeat center/cover;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookRideModalLabel">Book a Ride</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('book_ride') }}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Vehicle Model</label>
+                        <input type="text" name="vehicle_model" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Seat Capacity</label>
+                        <input type="number" name="seat_capacity" class="form-control" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">License Number</label>
+                        <input type="text" name="license_number" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Departure Time</label>
+                        <input type="datetime-local" name="departure_time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Number of People in Vehicle</label>
+                        <input type="number" name="people" class="form-control" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Your Stop</label>
+                        <input type="text" id="stop-input" name="stop" class="form-control" placeholder="e.g., Downtown Station" required>
+                        <input type="hidden" id="stop-place-id" name="stop_place_id">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Book Ride</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bookings Listing -->
+<div class="mt-5">
+    <h3 class="mb-3">Booked Rides</h3>
+    {% if bookings %}
+        <div class="row g-3">
+            {% for booking in bookings %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ booking.vehicle_model }}</h5>
+                            <p class="card-text">
+                                <strong>License #:</strong> {{ booking.license_number }}<br>
+                                <strong>Seats:</strong> {{ booking.seat_capacity }}<br>
+                                <strong>Departure:</strong> {{ booking.departure_time }}<br>
+                                <strong>People in Car:</strong> {{ booking.people }}<br>
+                                <strong>Stop:</strong> {{ booking.stop or 'None' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No rides booked yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

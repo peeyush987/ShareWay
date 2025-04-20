@@ -1,0 +1,134 @@
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    min-height: calc(100vh - 300px);
+}
+
+/* Navbar */
+.navbar.custom-navbar {
+    background: linear-gradient(90deg, #1a3c34, #2a5d52) !important;
+    background-color: #1a3c34 !important; /* Fallback */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar.custom-navbar .navbar-brand,
+.navbar.custom-navbar .nav-link,
+.navbar.custom-navbar .nav-link.text-light {
+    color: #ffffff !important;
+    transition: color 0.3s ease;
+}
+
+.navbar.custom-navbar .nav-link:hover {
+    color: #d1e8e2 !important; /* Light green hover */
+}
+
+.navbar.custom-navbar .navbar-toggler-icon {
+    filter: invert(1); /* Visible toggler icon */
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    min-height: 400px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Buttons */
+.btn-primary {
+    background: #1a3c34;
+    background-color: #2a5d52;
+    border-color: #2a5d52;
+    border-radius: 25px;
+    padding: 10px 20px;
+    color: #ffffff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1a3c34;
+    border-color: #1a3c34;
+    color: #ffffff;
+}
+
+.btn-success {
+    background-color: #3c7a6b;
+    border-color: #3c7a6b;
+    border-radius: 25px;
+    padding: 10px 20px;
+    color: #ffffff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #2a5d52;
+    border-color: #2a5d52;
+    color: #ffffff;
+}
+
+/* Modals */
+.modal-content {
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Geoapify Autocomplete */
+.geoapify-autocomplete-items {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.geoapify-autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.geoapify-autocomplete-items div:hover {
+    background-color: #f0f0f0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 300px;
+    }
+
+    .card-img-top {
+        height: 150px;
+    }
+}
+
